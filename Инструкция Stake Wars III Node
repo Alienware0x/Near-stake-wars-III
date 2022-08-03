@@ -282,6 +282,8 @@ crontab -l
 Просмотрите свои логи:
 cat home/<USER_ID>/logs/all.log
 
+GL
+
 
 
 
