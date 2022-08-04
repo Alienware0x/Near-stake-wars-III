@@ -113,7 +113,7 @@ git clone https://github.com/near/nearcore
 cd nearcore
 git fetch
 ```
-Далее проверьте <commit> в файле и замените его на значение из файла
+Далее проверьте <commit> в файле и замените его на значение из файла https://github.com/near/stakewars-iii/blob/main/commit.md
 ```
 git checkout <commit>
 ```
