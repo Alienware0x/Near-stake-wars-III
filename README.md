@@ -47,75 +47,114 @@ Storage: 500GB SSD
 
 Запуск узла
 1.	Подключитесь к серверу и обновите пакеты
+
 sudo apt update && sudo apt upgrade -y
 
 2. Установите Node.js и npm
+
 curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -  sudo apt install build-essential nodejs
+
 PATH="$PATH"
+
 Проверьте версии:
+
 node -v
+
 Должен быть ответ: v18.xx
+
 npm -v
+
 Должен быть ответ: 8.xx
 
+
 3. Установите NEAR-CLI
+
 sudo npm install -g near-cli
 
 4. Настройте окружающую среду
+
 export NEAR_ENV=shardnet
+
 echo 'export NEAR_ENV=shardnet' >> ~/.bashrc
 
 5. Установите инструменты разработчика
+
 sudo apt install -y git binutils-dev libcurl4-openssl-dev zlib1g-dev libdw-dev libiberty-dev cmake gcc g++ python docker.io protobuf-compiler libssl-dev pkg-config clang llvm cargo
 
 6. Установите Python pip
+
 sudo apt install python3-pip
 
 7. Установите конфигурацию
+
 USER_BASE_BIN=$(python3 -m site --user-base)/bin
+
 export PATH="$USER_BASE_BIN:$PATH"
 
 8. Установите Building env
+
 sudo apt install clang build-essential make
 
 9. Установите Rust & Cargo
+
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
 Выберите “1”
+
 source $HOME/.cargo/env
 
 10. Клонируйте nearcore репозиторий
+
 git clone https://github.com/near/nearcore
+
 cd nearcore
+
 git fetch
+
 Далее проверьте <commit> в файле и замените его на значение из файла
+
 git checkout <commit>
 
+
 в моём случае команда выглядит так
+
 git checkout  c1b047b8187accbf6bd16539feb7bb60185bdc38
 
 11. Скомпилируйте бинарный файл
+
 cargo build -p neard --release --features shardnet
 
 12. Инициализируйте рабочую директорию
+
 Для правильной работы узлу NEAR требуется рабочий каталог и несколько файлов конфигурации.
+
 ./target/release/neard --home ~/.near init --chain-id shardnet --download-genesis
+
 Эта команда создаст структуру каталогов и сгенерирует config.json, node_key.json genesis.json
 
 13. Замените config.json
+
 rm ~/.near/config.json
+
 wget -O ~/.near/config.json https://s3-us-west-1.amazonaws.com/build.nearprotocol.com/nearcore-deploy/shardnet/config.json
 
 14. Установите AWS Cli
+
 sudo apt-get install awscli -y
 
 15. Замените genesis.json
+
 rm ~/.near/genesis.json
+
 cd ~/.near
+
 wget https://s3-us-west-1.amazonaws.com/build.nearprotocol.com/nearcore-deploy/shardnet/genesis.json
 
 
 Активация узла в качестве валидатора
+
 1.	Введите в терминале команду
+
 near login
 
 2. Затем скопируйте ссылку и вставьте её в браузер
@@ -145,11 +184,13 @@ near login
 ![image](https://user-images.githubusercontent.com/110548287/182636223-a7e5f7c5-4dec-4d03-982f-4a8f1e7dd22f.png)
 
 7. Проверьте validator_key.json
+
 cat ~/.near/validator_key.json
 
 Если файл validator_key.json отсутствует, выполните следующие действия, чтобы создать его:
 
 near generate-key <pool_id>
+
 <pool_id> — -> xx.factory.shardnet.near 
 
 где xx это имя вашего пула. Вам нужно придумать его самостоятельно
@@ -159,6 +200,7 @@ near generate-key <pool_id>
 near generate-key alienware1.factory.shardnet.near
 
 8. Скопируйте сгенерированный файл в папку shardnet
+
 cp ~/.near-credentials/shardnet/YOUR_WALLET.json ~/.near/validator_key.json
 
 YOUR_WALLET замените на ваше имя, в моем случае команда выглядит следующим образом:
@@ -166,16 +208,22 @@ YOUR_WALLET замените на ваше имя, в моем случае ко
 cp ~/.near-credentials/shardnet/alienware.shardnet.near.json ~/.near/validator_key.json
 
 9. Отредактируйте validator_key.json
+
 nano ~/.near/validator_key.json
+
 •	Отредактируйте «account_id» => xx.factory.shardnet.near, где xx — имя вашего пула.
 
 •	Измените private_key на secret_key
 
 Содержимое файла должно соответствовать следующему шаблону:
 {
+
   "account_id": "xx.factory.shardnet.near",
+  
   "public_key": "ed25519:HeaBJ3xLgvZacQWmEctTeUqyfSU4SDEnEwckWxd92W2G",
+  
   "secret_key": "ed25519:****"
+  
 }
 
 Ctrl+s — сохранить файл
@@ -183,26 +231,40 @@ Ctrl+s — сохранить файл
 Ctrl+x — закрыть файл
 
 10 . Создайте сервисный файл
+
 sudo nano /etc/systemd/system/neard.service
 
 Вставляем следующий текст в файл:
 
 [Unit]
+
 Description=NEARd Daemon Service
 
 [Service]
+
 Type=simple
+
 User=<USER>
+
 #Group=near
+
 WorkingDirectory=/home/<USER>/.near
+
 ExecStart=/home/<USER>/nearcore/target/release/neard run
+
 Restart=on-failure
+
 RestartSec=30
+
 KillSignal=SIGINT
+
 TimeoutStopSec=45
+
 KillMode=mixed
 
+
 [Install]
+
 WantedBy=multi-user.target
 
 ! Отредактирует строки USER, WorkingDirectory, ExecStart под ваши значения
@@ -223,7 +285,9 @@ sudo apt install cczejournalctl -n 100 -f -u neard | ccze -A
 
 
 Запуск стейкинг пула
+
 Разверните контракт стейкинг пула, шаблон команды:
+
 near call factory.shardnet.near create_staking_pool '{"staking_pool_id": "<pool id>", "owner_id": "<accountId>", "stake_public_key": "<public key>", "reward_fee_fraction": {"numerator": 5, "denominator": 100}, "code_hash":"DD428g9eqLL8fWUxv8QSpVFzyHi1Qd16P8ephYCTmMSZ"}' --accountId="<accountId>" --amount=450 --gas=300000000000000
 
 Замените на свои данные
@@ -245,41 +309,60 @@ near call factory.shardnet.near create_staking_pool '{"staking_pool_id": "<pool 
 ![photo_2022-08-03_12-31-50](https://user-images.githubusercontent.com/110548287/182637504-802cf460-de7c-467f-872d-87a7219b1007.jpg)
 
 Создайте cron задачу для автоматического пинга
+
 cd
+
 mkdir scripts
+
 cd scripts
+
 nano ping.sh
+
 
 В тексте файла прописываем:
 
 #!/bin/sh
+
 # Ping call to renew Proposal added to crontab
 
 export NEAR_ENV=shardnet
+
 export LOGS=/home/<USER_ID>/logs
+
 export POOLID=<YOUR_POOL_ID>
+
 export ACCOUNTID=<YOUR_ACCOUNT_ID>
 
 echo "---" >> $LOGS/all.log
+
 date >> $LOGS/all.log
+
 near call $POOLID.factory.shardnet.near ping '{}' --accountId $ACCOUNTID.shardnet.near --gas=300000000000000 >> $LOGS/all.log
+
 near proposals | grep $POOLID >> $LOGS/all.log
+
 near validators current | grep $POOLID >> $LOGS/all.log
+
 near validators next | grep $POOLID >> $LOGS/all.log
 
 Отредактируйте LOGS, POOLID, ACCOUNTID в зависимости от ваших данных.
 
 Создайте новый crontab, запускаемый каждые 5 минут:
+
 crontab -e
 
 Прописываем строку с измененным путем к файлу скрипта:
+
 */5 * * * * sh /home/<USER_ID>/scripts/ping.sh
+
 Сохраняем и закрываем файл
 
 Список crontab, чтобы увидеть, что он работает:
+
 crontab -l
 
 Просмотрите свои логи:
+
 cat home/<USER_ID>/logs/all.log
 
 GL
