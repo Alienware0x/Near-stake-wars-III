@@ -10,20 +10,25 @@ NEAR Team снова запускают Stake Wars, чтобы помочь де
 Для начал нужно заполнить форму для регистрации Chunk-Only Producer https://nearprotocol1001.typeform.com/to/Z39N7cU9?typeform
 
 После этого нужно создать кошелек, арендовать сервер и произвести запуск ноды. 
+# Требования к серверу для Chunk-only Producer
 
-Требования к серверу для Chunk-only Producer:
 CPU: 4-Core CPU with AVX support
+
 RAM: 8GB DDR4
+
 Storage: 500GB SSD
 
-Аренда сервера
+# Аренда сервера
+
 Подойдёт VPS S на contabo, добавьте к нему 400GB SSD за €1,5 в месяц (В требованиях заявлено 500GB, на практике 400GB достаточно).
 
 ![image](https://user-images.githubusercontent.com/110548287/182634066-cf70378c-9788-47de-b4f7-83c32417d69d.png)
 
 
-Создание кошелька
+# Создание кошелька
+
 Переходим на сайт https://wallet.shardnet.near.org/
+
 Нажимаем “Создать учетную запись”
 
 ![image](https://user-images.githubusercontent.com/110548287/182634247-c74f5e92-3324-485a-a5ce-e8c5206c46d8.png)
@@ -45,7 +50,8 @@ Storage: 500GB SSD
 
 ![image](https://user-images.githubusercontent.com/110548287/182634396-d64b9edc-5d12-46f5-913d-4cb9e0cec4f2.png)
 
-Запуск узла
+# Запуск узла
+
 1.	Подключитесь к серверу и обновите пакеты
 
 sudo apt update && sudo apt upgrade -y
@@ -150,8 +156,10 @@ cd ~/.near
 
 wget https://s3-us-west-1.amazonaws.com/build.nearprotocol.com/nearcore-deploy/shardnet/genesis.json
 
+ 
 
-Активация узла в качестве валидатора
+ 
+# Активация узла в качестве валидатора
 
 1.	Введите в терминале команду
 
@@ -284,7 +292,7 @@ sudo apt install cczejournalctl -n 100 -f -u neard | ccze -A
 Необходимо дождаться полной синхронизации
 
 
-Запуск стейкинг пула
+# Запуск стейкинг пула
 
 Разверните контракт стейкинг пула, шаблон команды:
 
@@ -308,7 +316,7 @@ near call factory.shardnet.near create_staking_pool '{"staking_pool_id": "<pool 
 
 ![photo_2022-08-03_12-31-50](https://user-images.githubusercontent.com/110548287/182637504-802cf460-de7c-467f-872d-87a7219b1007.jpg)
 
-Создайте cron задачу для автоматического пинга
+# Создайте cron задачу для автоматического пинга
 
 cd
 
@@ -347,7 +355,7 @@ near validators next | grep $POOLID >> $LOGS/all.log
 
 Отредактируйте LOGS, POOLID, ACCOUNTID в зависимости от ваших данных.
 
-Создайте новый crontab, запускаемый каждые 5 минут:
+# Создайте новый crontab, запускаемый каждые 5 минут:
 
 crontab -e
 
